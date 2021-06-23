@@ -1,0 +1,15 @@
+group 'com.xuzimian.java.learning'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-security")
+    compile('org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.3.3.RELEASE')
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.security:spring-security-test")
+}

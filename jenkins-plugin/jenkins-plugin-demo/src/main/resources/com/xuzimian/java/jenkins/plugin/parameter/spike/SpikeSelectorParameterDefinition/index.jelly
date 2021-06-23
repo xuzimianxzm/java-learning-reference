@@ -1,0 +1,23 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core"
+         xmlns:f="/lib/form"
+>
+    <j:set var="escapeEntryTitleAndDescription" value="false"/>
+    <f:entry title="${h.escape(it.name)}" description="${it.formattedDescription}">
+        <div name="parameter">
+            <input type="hidden" name="name" value="${it.name}"/>
+            <span style="width:400px">
+                <f:textbox name="value" value="${it.defaultValue4Build}" style="width:400px"/>
+            </span>
+
+            <span style="width:400px;margin-left:30px;">
+                <select name="value" style="width:380px;" class="setting-input select">
+                  <j:forEach var="option" items="${it.options}">
+                      <f:option selected="${it.defaultParameterValue.value==option}">${option}</f:option>
+                   </j:forEach>
+                </select>
+              </span>
+
+		</div>
+	</f:entry>
+</j:jelly>
