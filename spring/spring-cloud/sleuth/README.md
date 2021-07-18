@@ -19,3 +19,19 @@ Annotation/Event:
 - ss: 服务端发送。在请求处理完成时注释(响应被发送会客户端)。这个时间戳减去 sr 时间戳得到服务端处理请求的时间。
 - cr: Client Received. Signifies the end of the span. The client has successfully received the response from the server side. Subtracting the cs timestamp from this timestamp reveals the whole time needed by the client to receive the response from the server.
 - cr:  客户端接收。标示跨度结束。和护短成功从服务端接收到响应。这个时间戳减去 cs 时间戳得到客户端从服务端接收到响应的全部时间。
+
+## Span Lifecycle with Spring Cloud Sleuth’s API
+
+Spring Cloud Sleuth Core 在他的 api 模块中包含所有必要的要有追踪者实现的接口。
+
+最常用的接口有：
+
+- org.springframework.cloud.sleuth.Tracer: 使用追踪者，你能创建一个根跨度去捕获关键路径的请求。
+- org.springframework.cloud.sleuth.Span: 跨度是一个单独工作单元它碧玺有启动和结束。包含计时信息和事件和标签
+
+Span 生命周期行为如下:
+
+- start: 当你开始一个跨度，它的名字被分配并且记录开始的时间戳。
+- end: 跨度被结束(跨度的结束时间被记录)，并且如果跨度被采样，它是有资格被收集。
+- continue: 跨度被另一个线程继续。
+- create with explicit parent: 你可以创建一个新的跨度并且为它设置一个明确的父级跨度。
