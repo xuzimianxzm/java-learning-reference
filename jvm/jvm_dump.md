@@ -38,18 +38,91 @@
   ````
   Thread dump 就是个文本文件格式, 直接打开查看就可以了.Intellij IDEA 提供 Stacktrace 的分析, 我们可以用它来分析 Thread dump, 这样可以方便的知道某个线程运行到哪里.
 
-## JDK tools
+## Java Dump tools
 
 JDK 的 bin 目彔下,包含了 java 命令及其他实用工具
 
 - jps: 查看本机的 Java 中进程信息。
-- jstack: 打印线程的栈信息,制作线程 Dump。
-- jmap: 打印内存映射,制作堆 Dump。
+
+- jstack: 是一个抓取 thread dump 文件的有效的命令行工具，它位于 JDK 目录里的 bin 文件夹下（JDK_HOME\bin），以下是抓取 dump 文件的命令：
+  ````sh
+  jstack -l  <pid> > <file-path>
+  ````
+
+- Kill -3: 有一部分生产环境的机器只包含 JRE 环境，因此就不能使用 jstack 工具了，在这种情况下，我们可以使用 kill -3 的方式。当使用 kill -3 生成 dump 文件时，
+   dump 文件会被输出到标准错误流。假如你的应用运行在 tomcat 上，dump 内容将被发送到<TOMCAT_HOME>/logs/catalina.out 文件里。
+
+- jmap: 命令是JDK提供的用于生成堆内存信息的工具,制作堆 Dump。
+  ````sh
+  jmap -dump:live,format=b,file=heap.hprof <pid>
+  ````
+
 - jstat: 性能监控工具。
-- jhat: 内存分析工具。
-- jconsole: 简易的可视化控制台。
-- jvisualvm: 功能强大的控制台。
 
-## Jprofile
+- jhat: 内存分析工具,是JDK自带的用于分析JVM Heap Dump文件的工具，使用下面的命令可以将堆文件的分析结果以HTML网页的形式进行展示：
+  ````sh
+  jhat <heap-dump-file>
+  ````
+  
+- jconsole: 简易的可视化控制台,是JDK提供的一个基于GUI查看JVM系统信息的工具，既可以管理本地的JVM，也可以管理远程的JVM
 
-JProfiler 是由 ej-technologies GmbH 公司开发的一款性能瓶颈分析工具。
+- JVisualVM：Java VisualVM 是一个可以提供 JVM 信息的图形界面工具。它位于 JDK_HOME\bin\jvisualvm.exe 文件里。从 JDK6 Update7 开始，它被包含进 JDK 里。这个工具可以从本地或者远程运行的 JVM 里抓取 dump 文件。
+
+- JMC: Java Mission Control (JMC) 是一个能从本地或生产环境中收集和分析数据的工具，从 Oracle JDK 7 Update 40 开始，它被包含进 JDK 里，它可以从 JVM 里生成 dump 文件。JMC 位于 JDK_HOME\bin\jmc.exe 文件里：运行该工具之后，你可以看到运行在本地的 Java 进程，它也可以连接到远程机器。双击你想要生成 dump 文件的 Java 进程，点击Flight Recorder，你会看到以下的对话框：
+
+- ThreadMXBean: 从 JDK 1.5 开始，ThreadMXBean 被引入。这是 JVM 的管理接口，使用这个接口你仅需要少量的代码就能生成 dump 文件，以下是使用 ThreadMXBean 生成 dump 文件的主要实现：
+  ````java
+  public void  dumpThreadDump() {
+   ThreadMXBean threadMxBean = ManagementFactory.getThreadMXBean();
+   for (ThreadInfo ti : threadMxBean.dumpAllThreads(true, true)) {
+       System.out.print(ti.toString());
+   }
+  }
+  ````
+
+- APM Tool – App Dynamics: 一些应用性能监控工具提供了生成 dump 文件的功能。
+
+- Eclipse Memory Analyzer(MAT): 是Eclipse提供的一款用于Heap Dump分析的工具，用来辅助发现内存泄漏减少内存占用，从数以百万计的对象中快速计算出对象的 Retained Size，查看并自动生成一个 Leak Suspect（内存泄露可疑点）报表。
+
+- JProfiler: 是由 ej-technologies GmbH 公司开发的一款性能瓶颈分析工具。是收费工具。
+
+## 为何会内存溢出
+1)JVM内存过小，
+
+2)程序不严密，
+
+3)产生过多的垃圾无法回收。
+
+## Out Of Memory
+````java
+//Dump;
+public class Test5 {
+    Byte[] array = new Byte[1024*1024];//1MB
+
+    public static void main(String[] args) {
+        ArrayList<Test5> list = new ArrayList<>();
+        int count = 0;
+
+        //Throwable
+          //Exception
+          //Error
+        try {
+            while (true) {
+                list.add(new Test5());
+                count = count +1;
+            }
+        }catch (Error e){
+            System.out.println(count);
+            e.printStackTrace();
+        }
+    }
+}
+````
+
+java.lang.OutOfMemoryError，由于堆内存溢出是 Error，不是 Exception，需要用 Error 来捕获，在实际开发中有时很难检查出错误，需要使用工具来分析。
+
+先配置 Java 虚拟机，在 VM Options 中添加配置:
+````sh
+-Xms1m -Xmx8m -XX:+HeapDumpOnOutOfMemoryError
+````
+而如果不指定选项“XX:HeapDumpPath”，则在当前目录下生成dump文件。
