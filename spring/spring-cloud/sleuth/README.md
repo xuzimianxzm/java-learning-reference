@@ -35,3 +35,31 @@ Span 生命周期行为如下:
 - end: 跨度被结束(跨度的结束时间被记录)，并且如果跨度被采样，它是有资格被收集。
 - continue: 跨度被另一个线程继续。
 - create with explicit parent: 你可以创建一个新的跨度并且为它设置一个明确的父级跨度。
+
+## Context Propagation
+Traces connect from service to service using header propagation. 
+
+Traces从服务连接到服务使用header传播。默认格式是B3.
+```
+   Client Tracer                                                  Server Tracer     
+┌───────────────────────┐                                       ┌───────────────────────┐
+│                       │                                       │                       │
+│   TraceContext        │          Http Request Headers         │   TraceContext        │
+│ ┌───────────────────┐ │         ┌───────────────────┐         │ ┌───────────────────┐ │
+│ │ TraceId           │ │         │ X-B3-TraceId      │         │ │ TraceId           │ │
+│ │                   │ │         │                   │         │ │                   │ │
+│ │ ParentSpanId      │ │ Inject  │ X-B3-ParentSpanId │ Extract │ │ ParentSpanId      │ │
+│ │                   ├─┼────────>│                   ├─────────┼>│                   │ │
+│ │ SpanId            │ │         │ X-B3-SpanId       │         │ │ SpanId            │ │
+│ │                   │ │         │                   │         │ │                   │ │
+│ │ Sampling decision │ │         │ X-B3-Sampled      │         │ │ Sampling decision │ │
+│ └───────────────────┘ │         └───────────────────┘         │ └───────────────────┘ │
+│                       │                                       │                       │
+└───────────────────────┘                                       └───────────────────────┘
+```
+
+Similar to data formats, you can configure alternate header formats also,
+与数据格式类似,也可以配置代替的header格式，提供的traceId 和 spanId和B3兼容。最值得注意的是，这表明traceId 和 spanId是小写的，不是uuid
+除了trace标识符，其他属性也可以一起随着请求传递。
+
+要使用提供的默认值你可以设置spring.sleuth.propagation.type属性。值可以是一个集合，这种情况下你将可以传播更多的追踪header。
