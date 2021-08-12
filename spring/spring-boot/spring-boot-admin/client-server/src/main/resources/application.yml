@@ -1,0 +1,21 @@
+server:
+  port: 8768
+
+spring:
+  application:
+    name: client-server
+  boot:
+    admin:
+      client:
+        url: http://localhost:8769
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+spring.boot.admin.client:
+  username: admin
+  password: 123456
+
