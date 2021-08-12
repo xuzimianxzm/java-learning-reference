@@ -1,3 +1,12 @@
+## Introduction
+
+Spring Cloud Sleuth 是 Spring Cloud 的一个组件，它的主要功能是在分布式系统中提供服务链路追踪的解决方案。
+
+微服务架构是一个分布式架构，它按业务划分服务单元，一个分布式系统往往有很多个服务单元。
+由于服务单元数量众多，业务的复杂性，如果出现了错误和异常，很难去定位。
+主要体现在，一个请求可能需要调用很多个服务，而内部服务的调用复杂性，决定了问题难以定位。
+所以微服务架构中，必须实现分布式链路追踪，去跟进一个请求到底有哪些服务参与，参与的顺序又是怎样的，从而达到每个请求的步骤清晰可见，出了问题，很快定位。
+
 ## Terminology
 
 Spring Cloud Sleuth 借鉴了 Dapper 的术语。
@@ -17,7 +26,6 @@ Annotation/Event:
 - cs: 客户端发送，客户端发起一个请求。这个注释指示了跨度的开始。
 - sr: 服务端接收。服务端获取到请求并且开始处理它。从这个时间戳减去 cs 的时间戳可得到网络延迟。
 - ss: 服务端发送。在请求处理完成时注释(响应被发送会客户端)。这个时间戳减去 sr 时间戳得到服务端处理请求的时间。
-- cr: Client Received. Signifies the end of the span. The client has successfully received the response from the server side. Subtracting the cs timestamp from this timestamp reveals the whole time needed by the client to receive the response from the server.
 - cr:  客户端接收。标示跨度结束。和护短成功从服务端接收到响应。这个时间戳减去 cs 时间戳得到客户端从服务端接收到响应的全部时间。
 
 ## Span Lifecycle with Spring Cloud Sleuth’s API
@@ -63,3 +71,49 @@ Similar to data formats, you can configure alternate header formats also,
 除了trace标识符，其他属性也可以一起随着请求传递。
 
 要使用提供的默认值你可以设置spring.sleuth.propagation.type属性。值可以是一个集合，这种情况下你将可以传播更多的追踪header。
+
+## Zipkin
+
+Zipkin 是 Twitter 的一个开源项目，它基于 Google 的 Dapper 实现。Zipkin 用于收集分布式系统的链路数据，提供了数据持久化策略，也提供
+面向开发者的 API 接口用于查询数据。
+
+Zipkin 提供了可插拔式的数据存储方式，目前支持的数据存储有 In-Memory,Mysql,Cassandra 和 ElasticSearch。
+
+![avatar](https://gitee.com/xuzimian/Image/raw/master/Spring/SpringCloud/zipkin_struct_flow.png)
+
+1. instrumented 数据采集：我们可以想象数据就像一个水流，流过一个管道这个管道就是 instrumented。instrumented 需要过滤那些数据需要采集上报，那些不需要。就形成了图里面 instrumented clinet 的两个分支。
+2. transport 数据上报代理：数据在发送到服务端可以使用多种渠道，例如：发送 http 请求、发送 mq 消息等。
+3. collector 数据接收汇总：接收 transport 发送的数据由于发送渠道多种多样，所以接收端要适配各种渠道
+4. storage 数据存储模块：由于数据存储介质多种多样，例如：内存、mysql 等，所以存储模块要适配各种介质
+5. api 和 ui 负责监控数据的展示：通过浏览器展示监控数据
+
+### Zipkin deploy and run
+
+- Docker 方式:
+
+```sh
+docker run -d -p 9411:9411 openzipkin/zipkin
+```
+
+- Jar 包方式（JDK8）
+
+```sh
+curl -sSL https://zipkin.apache.org/quickstart.sh | bash -s
+java -jar zipkin.jar
+```
+
+设置启动参数例子:
+
+```sh
+java -jar zipkin-server-***-exec.jar --zipkin.collector.rabbitmq.addresses=localhost --zipkin.collector.rabbitmq.port=6572 --zipkin.collector.rabbitmq.username=guest --zipkin.collector.rabbitmq.password=guest --STORAGE_TYPE=mysql --MYSQL_HOST=localhost --MYSQL_TCP_PORT=3306 --MYSQL_DB=zipkin --MYSQL_USER=root --MYSQL_PASS=rootroot
+```
+
+### Spring Cloud Sleuth Intergation Zipkin
+
+在 application.yaml 文件中配置 zikpin server url 即可
+
+```yaml
+spring:
+  zipkin:
+    base-url: http://localhost:9411/
+```
