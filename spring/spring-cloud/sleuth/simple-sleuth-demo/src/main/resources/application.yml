@@ -4,3 +4,4 @@ server:
 spring:
   application:
     name: Simple Sleuth Demo
+  zipkin: http://localhost:9441/
