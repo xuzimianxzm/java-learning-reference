@@ -98,7 +98,7 @@ docker run -d -p 9411:9411 openzipkin/zipkin
 - Jar 包方式（JDK8）
 
 ```sh
-curl -sSL https://zipkin.apache.org/quickstart.sh | bash -s
+curl -sSL https://zipkin.io/quickstart.sh | bash -s
 java -jar zipkin.jar
 ```
 
