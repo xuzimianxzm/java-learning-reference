@@ -11,7 +11,9 @@ import java.util.*
 
 class GrayLoadBalancerRule : AbstractLoadBalancerRule() {
     private val random = Random()
+
     override fun initWithNiwsConfig(clientConfig: IClientConfig) {}
+
     override fun choose(key: Any): Server {
         var grayInvocation = false
         return try {
