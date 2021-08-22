@@ -40,7 +40,8 @@ bash startup.sh -m standalone
 
 本模块 Demo 简单模拟了灰度发布的流量控制场景，其包含：
 
-- nacos-provider-server ： 一个服务提供方
+- nacos-normal-provider-server ： 正常服务提供方
+- nacos-gray-provider-server ： 灰度服务提供方
 - nacos: 服务发现
 - nacos-consumer-load-balance-enhance: 服务消费端，通过灰度标记，来决定是否调用对应的服务提供方
 
