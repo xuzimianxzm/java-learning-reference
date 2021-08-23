@@ -7,5 +7,5 @@ import org.springframework.web.bind.annotation.RequestHeader
 @FeignClient(name = "nacos-traffic-service")
 interface EchoClient {
     @GetMapping("/")
-    fun echo(@RequestHeader("Gray") gray: String?): String
+    fun echo(@RequestHeader("Gray") gray: String): String
 }

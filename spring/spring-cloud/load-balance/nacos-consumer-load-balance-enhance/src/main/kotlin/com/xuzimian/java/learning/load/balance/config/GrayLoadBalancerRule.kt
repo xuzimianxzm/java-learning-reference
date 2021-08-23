@@ -14,7 +14,7 @@ class GrayLoadBalancerRule : AbstractLoadBalancerRule() {
 
     override fun initWithNiwsConfig(clientConfig: IClientConfig) {}
 
-    override fun choose(key: Any): Server {
+    override fun choose(key: Any?): Server {
         var grayInvocation = false
         return try {
             val grayTag = RibbonRequestContextHolder.currentContext["Gray"]
