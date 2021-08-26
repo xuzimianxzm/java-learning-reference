@@ -43,7 +43,7 @@ bash startup.sh -m standalone
 - nacos: 服务发现,基础依赖服务，必须先启动(需自行前往下载)
 - common/nacos-normal-provider-server ： 正常服务提供方
 - common/nacos-gray-provider-server ： 灰度服务提供方
-- nacos-consumer-load-balance-enhance: 服务消费端，通过灰度标记，来决定是否调用对应的服务提供方
+- load-balance/nacos-consumer-load-balance-enhance: 服务消费端，通过灰度标记，来决定是否调用对应的服务提供方
 
 下面两个命令分别使用 RestTemplate 和 OpenFeign 发起服务调用，结果都会路由到会读实例上，如果没有"Gray:true"这个 Header,结果都会路由到正常实例上：
 
@@ -51,3 +51,26 @@ bash startup.sh -m standalone
 curl -s -H "Gray:true" http://localhost:8888/echoFeign
 curl -s -H "Gray:true" http://localhost:8888/echo
 ```
+
+## Configuration Management
+
+### Gray Publish Dynamic Update Traffic Control Demo
+
+本 Demo 基本上和上面的 Demo 差不多，都是全链路灰度流量控制，区别是本项目中会根据 nacos 配置中心配置的数据来动态识别流量是否切换到灰度，
+
+- nacos: 服务发现,基础依赖服务，必须先启动(需自行前往下载)
+- common/nacos-normal-provider-server ： 正常服务提供方
+- common/nacos-gray-provider-server ： 灰度服务提供方
+- configuration-management/nacos-consumer-load-balance-dynamic-update-enhance: 服务消费端，通过灰度标记，来决定是否调用对应的服务提供方
+
+需要额外在 nacos 配置中心配置如下内容配置:
+
+- Data ID: nacos-consumer-load-balance-dynamic-update-enhance.properties
+  (注意: Data ID 必须和对应项目上的spring.application.name一致)
+
+- 配置内容:
+  ```properties
+  traffic.rule.type=header
+  traffic.rule.name=Gray
+  traffic.rule.value=true
+  ```
