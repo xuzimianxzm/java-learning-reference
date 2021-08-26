@@ -23,7 +23,7 @@ bash startup.sh -m standalone
 
 - 访问 nacos 地址: http://localhost:8848/nacos ,默认登录名和密码都是 nacos
 
-## 应用流量控制
+## LoadBalance: Application Traffic Control
 
 流量控制指的是根据一些流量特征，控制其流向下游的动作，流量控制可以应用在很多业务场景中，比如金丝雀发布,同机房发布，标签路由，全链路灰度发布。
 
@@ -36,13 +36,13 @@ bash startup.sh -m standalone
 - 流量识别能力
 - 实力打标能力
 
-### 会读发布 Demo
+### Gray Publish Traffic Control Demo
 
 本模块 Demo 简单模拟了灰度发布的流量控制场景，其包含：
 
-- nacos-normal-provider-server ： 正常服务提供方
-- nacos-gray-provider-server ： 灰度服务提供方
-- nacos: 服务发现
+- nacos: 服务发现,基础依赖服务，必须先启动(需自行前往下载)
+- common/nacos-normal-provider-server ： 正常服务提供方
+- common/nacos-gray-provider-server ： 灰度服务提供方
 - nacos-consumer-load-balance-enhance: 服务消费端，通过灰度标记，来决定是否调用对应的服务提供方
 
 下面两个命令分别使用 RestTemplate 和 OpenFeign 发起服务调用，结果都会路由到会读实例上，如果没有"Gray:true"这个 Header,结果都会路由到正常实例上：
