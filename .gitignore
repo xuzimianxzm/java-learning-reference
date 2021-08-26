@@ -16,6 +16,7 @@ charts/
 charts-override/
 **/jenkins-plugin/**/work
 **/jenkins-plugin/**/target
+spring/spring-cloud/nacos
 
 ### STS ###
 .apt_generated
@@ -56,3 +57,4 @@ dataSources/
 *.zip
 *.tar.gz
 *.rar
+/spring/spring-cloud/nacos/
