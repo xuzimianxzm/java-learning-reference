@@ -1,5 +1,7 @@
 ## Nacos Server
 
+### Nacos start
+
 本模块内使用的服务注册时 Alibaba Nacos，可以从 最新稳定版本 下载 nacos-server-$version.zip 包。
 
 - https://github.com/alibaba/nacos/releases
@@ -22,6 +24,59 @@ bash startup.sh -m standalone
 ```
 
 - 访问 nacos 地址: http://localhost:8848/nacos ,默认登录名和密码都是 nacos
+
+### Nacos Docker start
+
+参考:
+https://nacos.io/zh-cn/docs/quick-start-docker.html
+
+- 单机模式 Derby
+
+```sh
+docker-compose -f nacos/standalone-derby.yaml up
+```
+
+- 如果希望使用 MySQL5.7
+
+```sh
+docker-compose -f nacos/standalone-mysql-5.7.yaml up
+```
+
+- 如果希望使用 MySQL8
+
+```sh
+docker-compose -f nacos/standalone-mysql-8.yaml up
+```
+
+#### 集群模式
+
+```sh
+docker-compose -f nacos/cluster-hostname.yaml up
+```
+
+- 服务注册
+
+```sh
+curl -X POST 'http://127.0.0.1:8848/nacos/v1/ns/instance?serviceName=nacos.naming.serviceName&ip=20.18.7.10&port=8080'
+```
+
+- 服务发现
+
+```sh
+curl -X GET 'http://127.0.0.1:8848/nacos/v1/ns/instance/list?serviceName=nacos.naming.serviceName'
+```
+
+- 发布配置
+
+```sh
+curl -X POST "http://127.0.0.1:8848/nacos/v1/cs/configs?dataId=nacos.cfg.dataId&group=test&content=helloWorld"
+```
+
+- 获取配置
+
+```sh
+  curl -X GET "http://127.0.0.1:8848/nacos/v1/cs/configs?dataId=nacos.cfg.dataId&group=test"
+```
 
 ## LoadBalance: Application Traffic Control
 
@@ -66,7 +121,7 @@ curl -s -H "Gray:true" http://localhost:8888/echo
 需要额外在 nacos 配置中心配置如下内容配置:
 
 - Data ID: nacos-consumer-load-balance-dynamic-update-enhance.properties
-  (注意: Data ID 必须和对应项目上的spring.application.name一致)
+  (注意: Data ID 必须和对应项目上的 spring.application.name 一致)
 
 - 配置内容:
   ```properties
