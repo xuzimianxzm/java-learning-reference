@@ -100,4 +100,33 @@ public class RegexExample {
 
         System.out.println("18991230T11:00:00000".split("T")[1].replace(":00000", ""));
     }
+
+
+    /**
+     * 正则字符串必须是数字且长度是7或10
+     */
+    @Test
+    public void exampleForStringLengthAndMustNumber() {
+        Pattern p = Pattern.compile("^[0-9]{7}$|[0-9]{10}$");
+
+        System.out.println(String.format("1234567 %s", p.matcher("1234567").matches()));
+        System.out.println(String.format("12345678 %s", p.matcher("12345678").matches()));
+        System.out.println(String.format("123456789 %s", p.matcher("123456789").matches()));
+        System.out.println(String.format("1234567890 %s", p.matcher("1234567890").matches()));
+        System.out.println(String.format("a234567 %s", p.matcher("a234567").matches()));
+        System.out.println(String.format("12 4567 %s", p.matcher("12 4567").matches()));
+        System.out.println(String.format("12-4567 %s", p.matcher("12-4567").matches()));
+        System.out.println(String.format(" 124567  %s", p.matcher(" 124567 ").matches()));
+    }
+
+    /**
+     * 任何不包含空格的，或者带换行的字符串，但可以为空
+     *
+     */
+    @Test
+    public void exampleForAnyNonBlanckString() {
+        String NOT_ALL_SPACE_REGEXP = "^.{0}$|.*\\S+.*$";
+
+
+    }
 }
