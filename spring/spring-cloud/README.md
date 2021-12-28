@@ -96,8 +96,8 @@ curl -X POST "http://127.0.0.1:8848/nacos/v1/cs/configs?dataId=nacos.cfg.dataId&
 本模块 Demo 简单模拟了灰度发布的流量控制场景，其包含：
 
 - nacos: 服务发现,基础依赖服务，必须先启动(需自行前往下载)
-- common/nacos-normal-provider-server ： 正常服务提供方
-- common/nacos-gray-provider-server ： 灰度服务提供方
+- basic-servers/nacos-normal-provider-server ： 正常服务提供方
+- basic-servers/nacos-gray-provider-server ： 灰度服务提供方
 - load-balance/nacos-consumer-load-balance-enhance: 服务消费端，通过灰度标记，来决定是否调用对应的服务提供方
 
 下面两个命令分别使用 RestTemplate 和 OpenFeign 发起服务调用，结果都会路由到会读实例上，如果没有"Gray:true"这个 Header,结果都会路由到正常实例上：
